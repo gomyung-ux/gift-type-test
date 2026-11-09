@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>선물 유형 테스트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* layout: one phone-width column, centered; start, quiz and result swap in place, the service intro closes the result */
+:root{
+  --bg:#F5F6FB; --surface:#FFFFFF; --fg:#1B1F3B; --muted:#5B6082; --line:#1B1F3B; --hair:#DDE0F0;
+  --accent:#FF4F7B; --on-accent:#1B1F3B; --yellow:#FFD84D; --on-yellow:#1B1F3B; --mark:#FFD84D;
+  --mint:#BFEBDD; --mint-ink:#0E4D3F; --lilac:#DAD3FF; --lilac-ink:#3A2F8F;
+  --font-display:"Do Hyeon","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14162B; --surface:#1E2140; --fg:#F4F2FF; --muted:#A9A7C9; --line:#8F8CC9; --hair:#2E3262;
+    --accent:#FF6B90; --on-accent:#14162B; --mark:#5C4E17;
+    --mint:#1F4A42; --mint-ink:#BFF0E0; --lilac:#3A3470; --lilac-ink:#DAD3FF; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14162B; --surface:#1E2140; --fg:#F4F2FF; --muted:#A9A7C9; --line:#8F8CC9; --hair:#2E3262;
+  --accent:#FF6B90; --on-accent:#14162B; --mark:#5C4E17;
+  --mint:#1F4A42; --mint-ink:#BFF0E0; --lilac:#3A3470; --lilac-ink:#DAD3FF; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;text-align:center;padding-inline:20px;padding-block:24px 64px;-webkit-text-size-adjust:100%}
+.wrap{max-width:440px;margin-inline:auto}
+.screen{display:flex;flex-direction:column;gap:20px}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;text-wrap:balance}
+p{text-wrap:pretty}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+.btn{display:block;width:100%;border:2px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);padding:14px 16px;font:500 16px/1.45 var(--font-body);text-align:center;box-shadow:0 4px 0 var(--line);cursor:pointer;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.primary{background:var(--accent);color:var(--on-accent);font:400 22px/1.3 var(--font-display);padding:16px}
+.btn.ghost{box-shadow:none;background:transparent;border-style:dashed}
+.btn[aria-pressed="true"]{background:var(--yellow);color:var(--on-yellow)}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.link{background:none;border:0;color:var(--muted);font:500 14px var(--font-body);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px}
+
+.tag{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:44px 20px 24px;box-shadow:0 6px 0 var(--line);display:flex;flex-direction:column;gap:16px;align-items:center}
+.tag::before{content:"";position:absolute;top:14px;left:50%;width:14px;height:14px;margin-left:-7px;border:2px solid var(--line);border-radius:50%;background:var(--bg)}
+.eyebrow{font-family:var(--font-display);font-size:16px;letter-spacing:.06em;color:var(--muted)}
+h1{font-size:clamp(34px,10vw,44px);line-height:1.15}
+.mark{background:linear-gradient(transparent 58%,var(--mark) 58%)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.pill{display:inline-block;border:2px solid var(--line);border-radius:999px;padding:2px 12px;font-size:13px;font-weight:500;background:var(--surface)}
+.pill.s{background:var(--mint);color:var(--mint-ink)}
+.pill.n{background:var(--lilac);color:var(--lilac-ink)}
+
+.art{width:100%;max-width:100%;aspect-ratio:1/1;border:2px dashed var(--line);border-radius:16px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:12px;color:var(--muted);font-size:13px}
+.art b{font-weight:700;font-size:14px;color:var(--fg)}
+.art.wide{aspect-ratio:4/3}
+.art img{width:100%;height:100%;object-fit:contain;display:block}
+.art.filled{border-style:solid;padding:0;overflow:hidden;background:#fff}
+#coverArt,#rArt{max-width:320px;margin-inline:auto}
+
+.progress{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
+.progress i{height:8px;border-radius:4px;background:var(--hair)}
+.progress i.on{background:var(--accent)}
+.qno{font-family:var(--font-display);font-size:18px;color:var(--muted)}
+.qtext{font-size:clamp(23px,6.6vw,28px);line-height:1.35}
+.opts{display:flex;flex-direction:column;gap:14px}
+.opt{min-height:76px;display:flex;align-items:center;justify-content:center}
+
+.rtype{font-size:clamp(34px,10vw,44px);line-height:1.15}
+.rline{color:var(--muted)}
+.card{border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:6px}
+.card h3{font-size:19px}
+.roles{display:grid;gap:12px}
+.block{display:flex;flex-direction:column;gap:14px;align-items:center}
+.block h2{font-size:26px;line-height:1.3}
+.picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.picker .btn{padding:10px 8px;font-size:14px;box-shadow:0 3px 0 var(--line);min-height:56px;display:flex;align-items:center;justify-content:center}
+.picker .btn.s{background:var(--mint);color:var(--mint-ink)}
+.picker .btn.n{background:var(--lilac);color:var(--lilac-ink)}
+.picker .btn[aria-pressed="true"]{background:var(--yellow);color:var(--on-yellow)}
+.pair{width:100%}
+.pair .score{font-family:var(--font-display);font-size:28px}
+.pair ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.chips .pill{font-size:13px}
+
+.service{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:24px 16px;display:flex;flex-direction:column;gap:20px;align-items:center;box-shadow:0 6px 0 var(--line)}
+.service h2{font-size:clamp(25px,7.4vw,30px);line-height:1.3}
+.shots{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;padding-bottom:8px}
+.shots .art{flex:0 0 72%;aspect-ratio:3/4;scroll-snap-align:center}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;counter-reset:s}
+.steps li{counter-increment:s;border:2px solid var(--line);border-radius:14px;padding:12px 10px;font-size:14px;line-height:1.45;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg)}
+.steps li::before{content:counter(s);width:26px;height:26px;border-radius:50%;background:var(--yellow);color:var(--on-yellow);font-family:var(--font-display);font-size:15px;display:grid;place-items:center}
+.feats{display:flex;flex-direction:column;width:100%}
+.feats div{padding:12px 0;border-top:1px solid var(--hair)}
+.feats div:first-child{border-top:0}
+.feats b{display:block;font-weight:700}
+.feats span{font-size:14px;color:var(--muted)}
+.ask{display:flex;flex-direction:column;gap:12px;width:100%}
+.ask h3{font-size:22px}
+.thanks{min-height:1.6em;font-size:14px;color:var(--muted)}
+.copybox{width:100%;font:14px/1.5 var(--font-body);color:var(--fg);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:10px;text-align:center;resize:none}
+
+.allhead{display:flex;flex-direction:column;gap:8px;align-items:center}
+.allhead h2{font-size:clamp(28px,8vw,34px);line-height:1.2}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
+.tcard{border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 10px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.tcard{word-break:keep-all}
+.tcard h3{font-size:19px;line-height:1.25}
+.tcard .tline{font-size:14px;font-weight:500;line-height:1.45}
+.tcard .tintro{line-height:1.5}
+.tcard.mine{border-color:var(--accent);box-shadow:0 4px 0 var(--accent)}
+.pill.me{background:var(--accent);color:var(--on-accent)}
+[hidden]{display:none!important}
+.modal{position:fixed;inset:0;z-index:20;background:rgba(10,12,30,.74);overflow-y:auto;padding:16px;display:flex;justify-content:center;align-items:flex-start}
+.sheet{width:100%;max-width:440px;margin-block:auto;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.sheet p{font-size:14px}
+.sheet img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--hair)}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.btn,.toast{transition:none}}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-XXXXXXXXXX");</script>
+</head>
+<body>
+
+
+<form name="interest" method="POST" data-netlify="true" hidden>
+  <input name="choice"><input name="type">
+</form>
+<main class="wrap">
+
+<section class="screen" id="s-start">
+  <div class="tag">
+    <span class="eyebrow">GIFT TYPE TEST</span>
+    <h1>나는 어떤<br><span class="mark">선물 유형</span>일까?</h1>
+    <p class="muted">주는 나와 받는 나, 둘 다 알려 드려요.<br>9문항, 1분이면 끝나요.</p>
+    <div id="coverArt" class="art"></div>
+    <button class="btn primary" id="startBtn" type="button">테스트 시작하기</button>
+    <p class="small muted">재미로 보는 테스트예요.</p>
+  </div>
+</section>
+
+<section class="screen" id="s-quiz" hidden>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <p class="qno" id="qno" aria-live="polite"></p>
+  <h2 class="qtext" id="qtext"></h2>
+  <div class="opts">
+    <button class="btn opt" id="optA" type="button"></button>
+    <button class="btn opt" id="optB" type="button"></button>
+  </div>
+  <button class="link" id="backBtn" type="button">이전 문항</button>
+</section>
+
+<section class="screen" id="s-result" hidden>
+  <div class="tag">
+    <span class="pill" id="rBadge"></span>
+    <p class="eyebrow">나의 선물 유형은</p>
+    <h2 class="rtype" id="rName"></h2>
+    <div id="rArt" class="art"></div>
+    <p class="rline" id="rLine"></p>
+    <div class="meta" id="rTags"></div>
+  </div>
+
+  <div class="roles">
+    <div class="card"><h3>이런 유형이에요</h3><p id="rIntro"></p></div>
+    <div class="card"><h3>주는 나</h3><p id="rGive"></p></div>
+    <div class="card"><h3>받는 나</h3><p id="rGet"></p></div>
+    <div class="card"><h3>선물 궁합</h3><p id="rMatch"></p></div>
+  </div>
+
+  <div class="block">
+    <button class="btn primary" id="saveBtn" type="button">결과 사진 저장하기</button>
+    <p class="small muted">유형명부터 선물 궁합까지 한 장으로 만들어 드려요.<br>사진을 길게 눌러 저장한 뒤 인스타 스토리나 카톡에 올려 보세요.</p>
+  </div>
+
+  <div class="block">
+    <h2>친구와의 선물 궁합</h2>
+    <p class="muted">친구는 어떤 유형이에요? 골라 보세요.</p>
+    <div class="picker" id="picker"></div>
+    <div class="card pair" id="pair" hidden aria-live="polite"></div>
+  </div>
+
+  <div class="block">
+    <h3>이 유형과 잘 맞는 유형</h3>
+    <div class="chips" id="bestChips"></div>
+    <h3>서로 답답해지는 유형</h3>
+    <div class="chips" id="worstChips"></div>
+  </div>
+
+  <div class="service" id="service">
+    <span class="pill">서비스 소개</span>
+    <h2 id="svHead"></h2>
+    <p class="muted">생일 공동 선물 펀딩(가제)을 준비하고 있어요.<br>원하는 선물 하나를 친구들이 함께 완성해 줘요.</p>
+    <div class="shots" id="shots"></div>
+    <ol class="steps">
+      <li>받고 싶은 선물 하나를 골라 페이지를 만들어요</li>
+      <li>인스타 스토리나 카톡으로 링크를 공유해요</li>
+      <li>친구가 5천 원, 1만 원 등 원하는 만큼 참여해요</li>
+      <li>목표 금액이 차면 선물이 완성돼요</li>
+    </ol>
+    <div class="feats">
+      <div><b>친구가 대신 열어 줄 수 있어요</b><span>내가 말하기 민망해도 괜찮아요</span></div>
+      <div><b>목표가 덜 차도 괜찮아요</b><span>모인 금액에 내 돈을 보태 사면 돼요</span></div>
+      <div><b>금액은 숨기고 마음만 남겨요</b><span>누가 함께했는지 기록만 남아요</span></div>
+    </div>
+    <div class="ask">
+      <h3>이런 서비스가 있다면 어떨까요?</h3>
+      <button class="btn" type="button" data-k="interest" aria-pressed="false">관심 있어요</button>
+      <button class="btn" type="button" data-k="mine" aria-pressed="false">내 생일에 써 보고 싶어요</button>
+      <button class="btn" type="button" data-k="friend" aria-pressed="false">친구 생일에 써 보고 싶어요</button>
+      <p class="thanks" id="thanks" aria-live="polite"></p>
+    </div>
+    <p class="small muted">아직 만드는 중이라 버튼을 눌러도 가입이나 결제는 이뤄지지 않아요.</p>
+    <i id="endMark" aria-hidden="true"></i>
+  </div>
+
+  <button class="link" id="restartBtn" type="button">테스트 다시 하기</button>
+  <button class="btn" id="allBtn" type="button">모든 유형 살펴보기</button>
+</section>
+
+<section class="screen" id="s-all" hidden>
+  <div class="allhead">
+    <span class="eyebrow">GIFT TYPE</span>
+    <h2>선물 유형 8가지</h2>
+    <p class="muted">주는 나와 받는 나를 함께 보여 주는 8가지 유형이에요.</p>
+  </div>
+  <div class="grid" id="allGrid"></div>
+  <button class="btn primary" id="allBack" type="button" hidden>내 결과로 돌아가기</button>
+  <button class="link" id="allStart" type="button">테스트 시작하기</button>
+</section>
+
+</main>
+<div class="toast" id="toast" role="status"></div>
+<div class="modal" id="photoModal" role="dialog" aria-modal="true" aria-label="결과 사진" hidden>
+  <div class="sheet">
+    <p>사진을 길게 눌러 저장하세요.<br>컴퓨터에서는 사진을 우클릭해 저장할 수 있어요.</p>
+    <button class="btn" id="photoClose" type="button">닫기</button>
+    <img id="photoImg" alt="저장용 결과 사진">
+  </div>
+</div>
+
+<script>
+/* 일러스트와 소개 이미지는 여기에 파일 경로를 넣으면 자리에 바로 들어가요 */
+var ART = {
+  cover: "img/cover.jpg",
+  types: {1:"img/t1.jpg",2:"img/t2.jpg",3:"img/t3.jpg",4:"img/t4.jpg",5:"img/t5.jpg",6:"img/t6.jpg",7:"img/t7.jpg",8:"img/t8.jpg"},
+  intro: ["img/intro1.png","img/intro2.png","img/intro3.png"]
+};
+var INTRO_ALT = [
+  "문제 상황. 원하는 선물은 말하기도, 받기도 어렵다",
+  "해결 방식. 개인 Birthday Gift Page로 함께 완성",
+  "핵심 기능. 원하는 선물을 올리고, 원하는 만큼 후원"
+];
+var ALT = {
+  cover: "선물 상자를 열어 보는 두 햄스터",
+  1: "LIST가 적힌 긴 종이를 들고 있는 햄스터",
+  2: "장바구니를 밀며 영수증을 확인하는 햄스터",
+  3: "파티 모자를 쓰고 선물 더미 위에서 기뻐하는 햄스터",
+  4: "카드를 끌어안고 눈물짓는 햄스터와 꽃다발",
+  5: "돋보기와 카메라를 든 탐정 햄스터",
+  6: "책상에서 메모를 쓰는 햄스터와 선물 상자",
+  7: "촛불 켜진 케이크 앞에 앉은 햄스터",
+  8: "마주 보고 있는 두 햄스터와 하트"
+};
+
+var AXES = ["말한다|눈치","깜짝|물어봄","소소|한방"];
+var QUESTIONS = [
+  {q:"생일 일주일 전, 갖고 싶은 게 확실히 있다면?", a:"단톡방에 \"나 이거 갖고 싶음\" 한 줄 던진다", b:"말은 안 하고 누가 알아채 주길 기다린다"},
+  {q:"친구가 \"생일에 뭐 갖고 싶어?\"라고 물었다", a:"링크까지 바로 보낸다", b:"\"아무거나 괜찮아~\"라고 답한다"},
+  {q:"10만 원이 넘는 물건이 갖고 싶다", a:"그래도 말해 본다", b:"말하기 미안해서 내 돈으로 산다"},
+  {q:"친구 생일이 3일 남았다", a:"몰래 취향을 파악해서 깜짝 선물을 준비한다", b:"그냥 뭐 갖고 싶은지 물어본다"},
+  {q:"선물에서 더 중요한 건?", a:"받는 순간의 놀람", b:"쓸 때의 만족"},
+  {q:"친구 취향이 잘 안 떠오른다", a:"인스타를 염탐해서 힌트를 찾는다", b:"직접 물어보고 정한다"},
+  {q:"친구 생일에 쓰는 예산은?", a:"1, 2만 원대로 자주 챙기는 편", b:"한 번에 제대로 사 주는 편"},
+  {q:"같은 돈이 있다면?", a:"친구 여러 명에게 작은 선물씩", b:"한 명에게 큰 선물 하나"},
+  {q:"내 생일에 받고 싶은 건?", a:"작은 선물 여러 개", b:"진짜 원하는 거 하나"}
+];
+
+/* r: 0 말한다, 1 눈치 / g: 0 물어봄, 1 깜짝 / z: 0 한방, 1 소소 */
+var TYPES = {
+  1:{r:0,g:0,z:0,name:"당당한 위시리스트러",line:"갖고 싶은 건 링크로 박제해 두는 사람",give:"뭘 갖고 싶은지 먼저 물어보고, 살 때는 한 번에 제대로 사요.",get:"갖고 싶은 걸 직접 말해요. 선물은 큰 거 하나가 좋아요."},
+  2:{r:0,g:0,z:1,name:"솔직한 실속 쇼퍼",line:"필요한 걸 정확히 말하고 정확히 사 주는 사람",give:"물어보고 사서 실패가 없어요. 부담 없는 금액으로 자주 챙겨요.",get:"필요한 걸 솔직하게 말해요. 작아도 쓸모 있는 선물이 최고예요."},
+  3:{r:0,g:1,z:0,name:"플렉스 서프라이저",line:"원하는 건 말하고, 줄 때는 깜짝으로 크게 터뜨리는 사람",give:"몰래 준비해서 크게 감동시키는 편이에요.",get:"갖고 싶은 건 말해요. 크게 받으면 그만큼 크게 기뻐해요."},
+  4:{r:0,g:1,z:1,name:"작은 감동 수집가",line:"작은 선물에도 마음을 꽉 채워 주는 사람",give:"소소한 깜짝 선물을 자주 건네요. 기억해 뒀다가 챙기는 타입이에요.",get:"갖고 싶은 건 말하지만, 작은 선물 여러 개도 충분히 좋아요."},
+  5:{r:1,g:0,z:0,name:"속마음 탐정",line:"남에게는 잘 물으면서 내 속마음은 말 못 하는 사람",give:"친구가 뭘 원하는지 꼼꼼히 묻고, 큰 선물로 제대로 사요.",get:"갖고 싶은 게 있어도 말을 아껴요. 누가 알아채 주길 기다려요."},
+  6:{r:1,g:0,z:1,name:"조용한 체크리스트러",line:"챙기는 건 꼼꼼한데 내 위시는 속으로만 적는 사람",give:"물어보고 필요한 걸 사요. 부담 없는 선물을 자주 챙겨요.",get:"말은 못 해도 마음속엔 리스트가 있어요. 작은 선물이 편해요."},
+  7:{r:1,g:1,z:0,name:"무드 연출가",line:"분위기까지 설계해서 선물하는 사람",give:"몰래 준비해서 이벤트처럼 건네요. 한 번에 크게 감동시켜요.",get:"먼저 말하진 않지만 마음에 쏙 드는 큰 선물을 기다려요."},
+  8:{r:1,g:1,z:1,name:"눈치 만렙 센스쟁이",line:"말 안 해도 알아채고, 알아채 주길 바라는 사람",give:"친구가 흘린 한마디를 기억했다가 작은 깜짝 선물로 챙겨요.",get:"갖고 싶다는 말은 못 해도, 알아봐 주면 제일 좋아요."}
+};
+var DESC = {
+  1:{intro:"갖고 싶은 게 생기면 링크부터 저장해 두고, 누가 물어보면 바로 보내 주는 사람이에요.",
+     give:"선물을 줄 때도 뭘 갖고 싶은지 먼저 물어보고, 살 때는 한 번에 제대로 사 주는 편이에요. 취향을 짐작하다 빗나가는 일이 거의 없어요.",
+     get:"갖고 싶은 걸 직접 말하고, 선물은 큰 거 하나가 좋아요. 기프티콘 여러 장보다 원하던 하나를 받을 때 제일 기뻐해요.",
+     match:"같은 유형, 그리고 플렉스 서프라이저와 잘 맞아요. 눈치 만렙 센스쟁이와 조용한 체크리스트러는 말을 아끼는 쪽이라 뭘 사 줘야 할지 막막해질 수 있어요."},
+  2:{intro:"필요한 걸 정확히 말하고 정확히 사 주는 사람이에요.",
+     give:"물어보고 사서 실패가 없고, 부담 없는 금액으로 자주 챙겨요. 친구의 생일을 빠뜨리지 않는 편이에요.",
+     get:"필요한 걸 솔직하게 말하고, 작아도 쓸모 있는 선물이 최고예요. 쓰지 않는 선물이 쌓이는 것을 제일 아까워해요.",
+     match:"같은 유형, 그리고 작은 감동 수집가와 잘 맞아요. 무드 연출가의 큰 이벤트형 선물은 실속파에게 부담이 될 수 있고, 속마음 탐정은 물어봐도 속마음을 잘 말하지 않아 답답할 수 있어요."},
+  3:{intro:"원하는 건 말하고, 줄 때는 깜짝으로 크게 터뜨리는 사람이에요.",
+     give:"몰래 준비해서 크게 감동시키는 편이에요. 한 번 준비할 때 시간과 마음을 아끼지 않아요.",
+     get:"갖고 싶은 건 솔직하게 말해요. 크게 받으면 그만큼 크게 기뻐하는 사람이에요.",
+     match:"속마음 탐정과는 이 테스트에서 가장 잘 맞는 조합이고, 당당한 위시리스트러도 잘 맞아요. 작은 감동 수집가와 눈치 만렙 센스쟁이는 선물 크기 감각이 달라서 서로 부담스러울 수 있어요."},
+  4:{intro:"작은 선물에도 마음을 꽉 채워 주는 사람이에요.",
+     give:"소소한 깜짝 선물을 자주 건네요. 친구가 한마디 했던 걸 기억해 두었다가 챙기는 타입이에요.",
+     get:"갖고 싶은 건 말하지만, 작은 선물 여러 개도 충분히 좋아요. 횟수가 늘어도 마음이 전해지면 만족해요.",
+     match:"조용한 체크리스트러와 이 테스트에서 가장 잘 맞는 조합이고, 솔직한 실속 쇼퍼도 잘 맞아요. 플렉스 서프라이저와 무드 연출가는 한 번에 크게 해 주는 쪽이라 맞지 않을 수 있어요."},
+  5:{intro:"남에게는 잘 물으면서 내 속마음은 말 못 하는 사람이에요.",
+     give:"친구가 뭘 원하는지 꼼꼼히 물어보고, 큰 선물로 제대로 사 주는 편이에요. 물어보는 건 많이 해도 말하는 일은 적어요.",
+     get:"갖고 싶은 게 있어도 말을 아끼고, 누군가 알아채 주길 기다려요. 큰 선물일수록 말하기 미안해서 혼자 사는 편이에요.",
+     match:"플렉스 서프라이저와 이 테스트에서 가장 잘 맞는 조합이고, 당당한 위시리스트러도 잘 맞아요. 조용한 체크리스트러와는 둘 다 \"뭐 갖고 싶어?\"라고 물어보고 \"아무거나\"라고 답해서 가장 답답한 조합이에요. 눈치 만렙 센스쟁이도 정답을 잘 말해 주지 않아 답답할 수 있어요."},
+  6:{intro:"챙기는 건 꼼꼼한데 내 위시는 속으로만 적어 두는 사람이에요.",
+     give:"물어보고 필요한 걸 사요. 부담 없는 선물을 자주 챙겨서 친구가 받을 때 부담스럽지 않아요.",
+     get:"말은 못 해도 마음속에는 리스트가 있어요. 작은 선물이 편하고, 더 큰 건 말하기 미안해서 내 돈으로 사기도 해요.",
+     match:"작은 감동 수집가와 이 테스트에서 가장 잘 맞는 조합이고, 솔직한 실속 쇼퍼도 잘 맞아요. 속마음 탐정과는 서로 물어보기만 하고 답이 나오지 않아 답답하고, 무드 연출가는 선물 크기 감각이 달라 어긋날 수 있어요."},
+  7:{intro:"분위기까지 설계해서 선물하는 사람이에요.",
+     give:"몰래 준비해서 이벤트처럼 건네고, 한 번에 크게 감동시켜요. 선물을 주는 순간의 분위기도 선물의 일부라고 생각해요.",
+     get:"먼저 말하진 않지만 마음에 쏙 드는 큰 선물을 기다려요. 정성이 느껴지는 선물에 마음이 더 크게 움직여요.",
+     match:"같은 유형, 그리고 플렉스 서프라이저와 잘 맞아요. 솔직한 실속 쇼퍼는 이벤트보다 쓸모를 중시해 어긋날 수 있고, 조용한 체크리스트러는 선물 크기 감각이 달라 어긋날 수 있어요."},
+  8:{intro:"말 안 해도 알아채고, 알아채 주길 바라는 사람이에요.",
+     give:"친구가 무심코 흘린 한마디를 기억했다가 작은 깜짝 선물로 챙겨요. 인스타를 살펴보며 힌트를 찾는 일도 즐겨요.",
+     get:"갖고 싶다는 말은 못 해도, 알아봐 주면 제일 좋아요. 작은 선물이라도 내 말을 기억해 준 걸 알면 마음이 큰 사람이에요.",
+     match:"같은 유형, 그리고 작은 감동 수집가와 잘 맞아요. 당당한 위시리스트러는 정답을 바로 말해 주는 쪽이라 서로 템포가 달라 어긋날 수 있고, 속마음 탐정은 물어봐도 답이 나오지 않아 답답할 수 있어요."}
+};
+var BEST = {1:[1,3],2:[2,4],3:[5,1],4:[6,2],5:[3,1],6:[4,2],7:[7,3],8:[8,4]};
+var WORST = {1:[8,6],2:[7,5],3:[4,8],4:[3,7],5:[6,8],6:[5,7],7:[2,6],8:[1,5]};
+var GIVE_ME = {"2":"내가 물어보면 친구가 바로 답해 줘서 편해요","1":"내 깜짝 선물을 친구가 눈치 있게 받아 줘요","0":"내 깜짝 선물이 친구 취향과 살짝 엇갈릴 수 있어요","-2":"내가 물어봐도 친구는 \"아무거나\"라고 해요"};
+var GIVE_FR = {"2":"친구가 물어보면 내가 바로 답해 줘서 편해요","1":"친구의 깜짝 선물을 내가 눈치 있게 받아 줘요","0":"친구의 깜짝 선물이 내 취향과 살짝 엇갈릴 수 있어요","-2":"친구가 물어봐도 나는 \"아무거나\"라고 해요"};
+
+var $ = function(id){ return document.getElementById(id); };
+var answers = [], cur = 0, locked = false, myType = 0, seen = {}, io = null;
+
+var GA_ID = "G-XXXXXXXXXX"; /* 구글 애널리틱스 측정 ID로 바꿔 주세요 */
+function track(name, data){
+  try{ (window.__giftEvents = window.__giftEvents || []).push({n:name, d:data||null, t:Date.now()}); }catch(e){}
+  try{ if(window.gtag && GA_ID.indexOf("XXXX") < 0){ gtag("event", name, data || {}); } }catch(e){}
+  /* 서비스 관심 버튼은 넷리파이 폼으로도 보내서 대시보드에서 바로 보이게 해요 */
+  try{
+    if(name === "interest" && data && data.on){
+      var body = new URLSearchParams({"form-name":"interest", choice:data.key, type:String(data.type || "")});
+      fetch("/", {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:body.toString()});
+    }
+  }catch(e){}
+}
+function art(src, title, hint, alt){
+  if(src){ return '<img src="'+src+'" alt="'+(alt || title)+'" decoding="async">'; }
+  return '<b>'+title+'</b><span>'+hint+'</span>';
+}
+function fillArt(el, src, title, hint, alt){
+  el.innerHTML = art(src, title, hint, alt);
+  el.classList.toggle("filled", !!src);
+}
+function toast(msg){
+  var t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.h); toast.h = setTimeout(function(){ t.classList.remove("show"); }, 1800);
+}
+function show(id){
+  ["s-start","s-quiz","s-result","s-all"].forEach(function(s){ $(s).hidden = (s !== id); });
+  closePhoto();
+  window.scrollTo(0,0);
+}
+
+function renderQ(){
+  var q = QUESTIONS[cur];
+  $("qno").textContent = "Q" + (cur+1) + " / " + QUESTIONS.length;
+  $("qtext").textContent = q.q;
+  $("optA").textContent = q.a;
+  $("optB").textContent = q.b;
+  $("backBtn").style.visibility = cur === 0 ? "hidden" : "visible";
+  var segs = $("progress").children;
+  for(var i=0;i<segs.length;i++){ segs[i].className = i <= cur ? "on" : ""; }
+}
+function pick(v){
+  if(locked) return;
+  locked = true;
+  answers[cur] = v;
+  track("answer", {q:cur+1, v:v});
+  setTimeout(function(){
+    locked = false;
+    if(cur === QUESTIONS.length - 1){ finish(); }
+    else { cur++; renderQ(); }
+  }, 140);
+}
+function finish(){
+  var a = [0,0,0];
+  answers.forEach(function(v,i){ if(v === "A") a[Math.floor(i/3)]++; });
+  var r = a[0] >= 2 ? 0 : 1, g = a[1] >= 2 ? 1 : 0, z = a[2] >= 2 ? 1 : 0;
+  myType = 1 + r*4 + g*2 + z;
+  track("result", {type:myType});
+  renderResult();
+  show("s-result");
+  watch();
+}
+
+function chip(n){ return '<span class="pill '+(TYPES[n].r?'n':'s')+'">'+TYPES[n].name+'</span>'; }
+function renderResult(){
+  var t = TYPES[myType];
+  $("rBadge").textContent = t.r ? "눈치 유형" : "말하는 유형";
+  $("rBadge").className = "pill " + (t.r ? "n" : "s");
+  $("rName").textContent = t.name;
+  $("rLine").textContent = t.line;
+  fillArt($("rArt"), ART.types[myType], "유형 일러스트 자리", "1:1 비율, 600×600 권장", ALT[myType]);
+  var parts = [AXES[0].split("|")[t.r], AXES[1].split("|")[t.g], AXES[2].split("|")[t.z]];
+  $("rTags").innerHTML = parts.map(function(p){ return '<span class="pill">'+p+'</span>'; }).join("");
+  var d = DESC[myType];
+  $("rIntro").textContent = d.intro;
+  $("rGive").textContent = d.give;
+  $("rGet").textContent = d.get;
+  $("rMatch").textContent = d.match;
+  $("bestChips").innerHTML = BEST[myType].map(function(n){ return n === myType ? '<span class="pill s">같은 유형</span>' : chip(n); }).join("");
+  $("worstChips").innerHTML = WORST[myType].map(chip).join("");
+  $("svHead").textContent = t.r ? "말하기 어려운 마음, 친구가 대신 열어 줄 수 있어요" : "원하는 선물 하나, 친구들과 함께 완성해요";
+  $("pair").hidden = true;
+  var btns = $("picker").children;
+  for(var i=0;i<btns.length;i++){ btns[i].setAttribute("aria-pressed","false"); }
+  $("thanks").textContent = "";
+  document.querySelectorAll("[data-k]").forEach(function(b){ b.setAttribute("aria-pressed","false"); });
+}
+
+function sc(g, r){ return g === 0 ? (r === 0 ? 2 : -2) : (r === 1 ? 1 : 0); }
+function showPair(n){
+  var me = TYPES[myType], fr = TYPES[n];
+  var s1 = sc(me.g, fr.r), s2 = sc(fr.g, me.r);
+  var same = me.z === fr.z;
+  var total = s1 + s2 + (same ? 2 : -2);
+  var label = total >= 5 ? "환상의 짝꿍" : total >= 3 ? "잘 맞아요" : total >= 0 ? "무난해요" : total >= -3 ? "조금 어긋나요" : "서로 답답해요";
+  var size = same ? (me.z ? "둘 다 작게 자주가 취향이라 선물 크기가 잘 맞아요" : "둘 다 크게 하나가 취향이라 선물 크기가 잘 맞아요") : "선물 크기 감각이 달라서 서로 부담될 수 있어요";
+  var p = $("pair");
+  p.innerHTML = '<p class="small muted">' + me.name + ' + ' + fr.name + '</p><p class="score">' + label + '</p><ul><li>' + GIVE_ME[String(s1)] + '</li><li>' + GIVE_FR[String(s2)] + '</li><li>' + size + '</li></ul>';
+  p.hidden = false;
+  track("friend_pick", {me:myType, friend:n, total:total});
+}
+
+var DISP = '"Do Hyeon","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+var BODY = '"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+var photoCache = {};
+
+function rr(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function wrapText(ctx, text, maxW){
+  var out = [], line = "";
+  for(var i = 0; i < text.length; i++){
+    var ch = text.charAt(i);
+    var t = line + ch;
+    if(ctx.measureText(t).width > maxW && line){
+      var sp = line.lastIndexOf(" ");
+      if(sp > 0 && ch !== " "){ out.push(line.slice(0, sp)); line = line.slice(sp + 1) + ch; }
+      else { out.push(line); line = ch === " " ? "" : ch; }
+    } else { line = t; }
+  }
+  if(line){ out.push(line); }
+  return out;
+}
+function loadImg(src){
+  return new Promise(function(res){
+    var im = new Image();
+    im.onload = function(){ res(im); };
+    im.onerror = function(){ res(null); };
+    im.src = src;
+  });
+}
+function paint(ctx, W, data, img, L, draw){
+  var INK = "#1B1F3B", MUTED = "#5B6082", M = 60, IW = W - M * 2, TW = IW - 120, i, k;
+  var tone = data.tone === 1 ? ["#DAD3FF", "#3A2F8F"] : ["#BFEBDD", "#0E4D3F"];
+  var c1 = M, cy = c1 + 70;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  if(draw){
+    rr(ctx, M, c1 + 10, IW, L.c1h, 48); ctx.fillStyle = INK; ctx.fill();
+    rr(ctx, M, c1, IW, L.c1h, 48); ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.stroke();
+  }
+  ctx.font = "500 34px " + BODY;
+  var bw = Math.ceil(ctx.measureText(data.badge).width) + 56;
+  if(draw){
+    rr(ctx, (W - bw) / 2, cy, bw, 64, 32); ctx.fillStyle = tone[0]; ctx.fill();
+    ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.stroke();
+    ctx.fillStyle = tone[1]; ctx.fillText(data.badge, W / 2, cy + 33);
+  }
+  cy += 64 + 40;
+  ctx.font = "400 38px " + DISP;
+  if(draw){ ctx.fillStyle = MUTED; ctx.fillText("나의 선물 유형은", W / 2, cy + 24); }
+  cy += 56;
+  ctx.font = "400 100px " + DISP;
+  var nl = wrapText(ctx, data.name, TW);
+  if(draw){ ctx.fillStyle = INK; for(i = 0; i < nl.length; i++){ ctx.fillText(nl[i], W / 2, cy + 60 + i * 116); } }
+  cy += nl.length * 116 + 24;
+  var S = 520, ix = (W - S) / 2;
+  if(draw){
+    ctx.save(); rr(ctx, ix, cy, S, S, 36); ctx.clip();
+    ctx.fillStyle = "#FFFFFF"; ctx.fillRect(ix, cy, S, S);
+    if(img){ ctx.drawImage(img, ix, cy, S, S); }
+    ctx.restore();
+    rr(ctx, ix, cy, S, S, 36); ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.stroke();
+  }
+  cy += S + 40;
+  ctx.font = "500 40px " + BODY;
+  var ll = wrapText(ctx, data.line, TW);
+  if(draw){ ctx.fillStyle = MUTED; for(i = 0; i < ll.length; i++){ ctx.fillText(ll[i], W / 2, cy + 29 + i * 58); } }
+  cy += ll.length * 58 + 28;
+  ctx.font = "500 34px " + BODY;
+  var ws = data.tags.map(function(s){ return Math.ceil(ctx.measureText(s).width) + 48; });
+  var tot = ws.reduce(function(a, b){ return a + b; }, 0) + 16 * (ws.length - 1);
+  var tx = (W - tot) / 2;
+  for(i = 0; i < ws.length; i++){
+    if(draw){
+      rr(ctx, tx, cy, ws[i], 60, 30); ctx.fillStyle = "#FFFFFF"; ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.fillStyle = INK; ctx.fillText(data.tags[i], tx + ws[i] / 2, cy + 31);
+    }
+    tx += ws[i] + 16;
+  }
+  cy += 60 + 64;
+  L.c1h = cy - c1;
+  var y = c1 + L.c1h + 10 + 40;
+  for(k = 0; k < data.cards.length; k++){
+    ctx.font = "400 36px " + BODY;
+    var bl = wrapText(ctx, data.cards[k][1], TW);
+    var h = 44 + 56 + 16 + bl.length * 58 + 46;
+    if(draw){
+      rr(ctx, M, y + 8, IW, h, 40); ctx.fillStyle = INK; ctx.fill();
+      rr(ctx, M, y, IW, h, 40); ctx.fillStyle = "#FFFFFF"; ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.fillStyle = INK;
+      ctx.font = "400 46px " + DISP; ctx.fillText(data.cards[k][0], W / 2, y + 44 + 28);
+      ctx.font = "400 36px " + BODY;
+      for(i = 0; i < bl.length; i++){ ctx.fillText(bl[i], W / 2, y + 44 + 56 + 16 + 29 + i * 58); }
+    }
+    y += h + 8 + 36;
+  }
+  ctx.font = "500 30px " + BODY;
+  if(draw){ ctx.fillStyle = MUTED; ctx.fillText("나의 선물 유형 테스트", W / 2, y + 16); }
+  return y + 32 + M;
+}
+function openPhoto(url){
+  $("photoImg").src = url;
+  $("photoModal").hidden = false;
+  document.body.style.overflow = "hidden";
+  $("photoClose").focus();
+}
+function closePhoto(){
+  var m = $("photoModal");
+  if(!m || m.hidden){ return; }
+  m.hidden = true;
+  document.body.style.overflow = "";
+}
+async function savePhoto(){
+  if(photoCache[myType]){ track("save_photo", {type:myType, cached:true}); openPhoto(photoCache[myType]); return; }
+  var btn = $("saveBtn");
+  btn.disabled = true;
+  btn.textContent = "사진 만드는 중";
+  try{
+    var t = TYPES[myType], d = DESC[myType];
+    var data = {
+      tone: t.r,
+      badge: t.r ? "눈치 유형" : "말하는 유형",
+      name: t.name,
+      line: t.line,
+      tags: [AXES[0].split("|")[t.r], AXES[1].split("|")[t.g], AXES[2].split("|")[t.z]],
+      cards: [["이런 유형이에요", d.intro], ["주는 나", d.give], ["받는 나", d.get], ["선물 궁합", d.match]]
+    };
+    var sample = [data.badge, data.name, data.line, "나의 선물 유형은", "나의 선물 유형 테스트"].concat(data.tags, data.cards.map(function(c){ return c[0] + c[1]; })).join("");
+    if(document.fonts && document.fonts.load){
+      try{
+        await Promise.race([
+          Promise.all([
+            document.fonts.load('400 40px "Do Hyeon"', sample),
+            document.fonts.load('400 36px "Noto Sans KR"', sample),
+            document.fonts.load('500 36px "Noto Sans KR"', sample)
+          ]),
+          new Promise(function(r){ setTimeout(r, 3000); })
+        ]);
+      }catch(e){}
+    }
+    var img = await loadImg(ART.types[myType]);
+    var W = 1080, L = {};
+    var tmp = document.createElement("canvas");
+    tmp.width = W; tmp.height = 10;
+    var H = paint(tmp.getContext("2d"), W, data, img, L, false);
+    var cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext("2d");
+    ctx.fillStyle = "#F5F6FB"; ctx.fillRect(0, 0, W, H);
+    paint(ctx, W, data, img, L, true);
+    var url = cv.toDataURL("image/jpeg", 0.92);
+    photoCache[myType] = url;
+    track("save_photo", {type:myType});
+    openPhoto(url);
+  }catch(e){
+    if(window.console){ console.error("savePhoto", e); }
+    toast("사진을 만들지 못했어요. 다시 눌러 주세요");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "결과 사진 저장하기";
+  }
+}
+
+function renderAll(){
+  var h = "";
+  for(var n = 1; n <= 8; n++){
+    var t = TYPES[n];
+    h += '<article class="tcard' + (n === myType ? ' mine' : '') + '">' +
+      (n === myType ? '<span class="pill me">내 유형</span>' : '') +
+      '<div class="art filled"><img src="' + ART.types[n] + '" alt="' + ALT[n] + '" loading="lazy" decoding="async"></div>' +
+      '<h3>' + t.name + '</h3>' +
+      '<span class="pill ' + (t.r ? 'n' : 's') + '">' + (t.r ? '눈치 유형' : '말하는 유형') + '</span>' +
+      '<p class="tline">' + t.line + '</p>' +
+      '<p class="tintro small muted">' + DESC[n].give + '</p></article>';
+  }
+  $("allGrid").innerHTML = h;
+  $("allBack").hidden = !myType;
+}
+
+function watch(){
+  if(io){ io.disconnect(); }
+  if(!("IntersectionObserver" in window)) return;
+  io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var k = e.target.id === "endMark" ? "service_end" : "service_seen";
+      if(!seen[k]){ seen[k] = 1; track(k, {type:myType}); }
+    });
+  }, {threshold:0.25});
+  io.observe($("service"));
+  io.observe($("endMark"));
+}
+
+function init(){
+  fillArt($("coverArt"), ART.cover, "표지 일러스트 자리", "1:1 비율, 600×600 권장", ALT.cover);
+  var pg = $("progress");
+  for(var i=0;i<QUESTIONS.length;i++){ pg.appendChild(document.createElement("i")); }
+  var pk = $("picker");
+  for(var n=1;n<=8;n++){
+    (function(n){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn " + (TYPES[n].r ? "n" : "s");
+      b.textContent = TYPES[n].name;
+      b.setAttribute("aria-pressed","false");
+      b.addEventListener("click", function(){
+        var all = pk.children;
+        for(var j=0;j<all.length;j++){ all[j].setAttribute("aria-pressed", all[j] === b ? "true" : "false"); }
+        showPair(n);
+      });
+      pk.appendChild(b);
+    })(n);
+  }
+  var sh = $("shots");
+  for(var k=0;k<3;k++){
+    var d = document.createElement("div");
+    d.className = "art";
+    fillArt(d, ART.intro[k], "소개 이미지 " + (k+1) + " 자리", "3:4 비율, 600×800 권장", INTRO_ALT[k]);
+    sh.appendChild(d);
+  }
+  $("startBtn").addEventListener("click", function(){
+    answers = []; cur = 0; track("start"); renderQ(); show("s-quiz");
+  });
+  $("optA").addEventListener("click", function(){ pick("A"); });
+  $("optB").addEventListener("click", function(){ pick("B"); });
+  $("backBtn").addEventListener("click", function(){
+    if(cur > 0 && !locked){ cur--; answers.length = cur; renderQ(); }
+  });
+  $("saveBtn").addEventListener("click", savePhoto);
+  $("photoClose").addEventListener("click", closePhoto);
+  $("photoModal").addEventListener("click", function(e){ if(e.target === this){ closePhoto(); } });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape"){ closePhoto(); } });
+  $("allBtn").addEventListener("click", function(){ track("view_all"); renderAll(); show("s-all"); });
+  $("allBack").addEventListener("click", function(){ show("s-result"); });
+  $("allStart").addEventListener("click", function(){
+    answers = []; cur = 0; track("start"); renderQ(); show("s-quiz");
+  });
+  $("restartBtn").addEventListener("click", function(){
+    track("restart"); answers = []; cur = 0; seen = {}; show("s-start");
+  });
+  document.querySelectorAll("[data-k]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      track("interest", {key:b.getAttribute("data-k"), on:on, type:myType});
+      $("thanks").textContent = on ? "고마워요! 반응을 참고해서 만들어 볼게요." : "";
+    });
+  });
+}
+init();
+</script>
+
+</body>
+</html>
